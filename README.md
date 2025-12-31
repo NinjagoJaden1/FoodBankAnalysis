@@ -4,171 +4,162 @@
 
 ---
 
-## Part 1: The Visualizations (The "Story")
-
-### 1. The "Hit List" (Map of Food Deserts)
+## 1. The "Hit List" (Food Deserts Map)
 **Strategic Question**: "We have limited trucks. Which 15 neighborhoods need them the most?"
 **The Insight**: These Census Tracts have the absolute lowest Healthy Food Access Scores (0.0). They are your primary targets.
+
+### The Visualization
 ![Food Deserts Map](Contra_Costa/png/food_deserts_mini_map.png)
 
-### 2. The Service Gap Matrix
-**Strategic Question**: "Do they need a Truck (No Stores) or a Partnership (Bad Stores)?"
-**The Insight**:
-*   **Red Dots (Bottom Left)**: **True Deserts**. 0 stores exist. **Standard Action**: Deploy Mobile Pantry.
-*   **Gold Dots (Bottom Right)**: **Food Swamps**. Stores exist, but they sell liquor/junk. **Standard Action**: Partner with corner stores to stock produce.
-![Service Gap Matrix](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/food_deserts_matrix.png)
+### The Strategy (The List)
+| Region | Neighborhood Name (Tract) | Priority |
+| :--- | :--- | :--- |
+| **CENTRAL** | **Concord (Monument Blvd)** | HIGH |
+| CENTRAL | Martinez & Pleasant Hill | MEDIUM |
+| **EAST** | **Pittsburg (Old Town)** | HIGH |
+| EAST | Oakley & Brentwood | MEDIUM |
+| **SOUTH** | **San Ramon & Blackhawk** | LOW (High Income) |
+| **WEST** | **Richmond (Central)** | HIGH |
 
-### 3. The Seasonal Pulse
+### The Code Logic (How we built this)
+We didn't just guess. The script finds these specific locations using a "Decision Tree":
+1.  **Count Stores** (`denominator`): "How many places sell food?"
+2.  **Count Quality** (`numerator`): "How many of them are supermarkets?"
+3.  **The Diagnosis**:
+    ```python
+    if denominator == 0:
+        diagnosis = "FOOD DESERT (No stores)"
+        action = "Deploy Mobile Pantry (Primary Target)"
+    ```
+
+---
+
+## 2. The Service Gap Matrix
+**Strategic Question**: "Do they need a Truck (No Stores) or a Partnership (Bad Stores)?"
+**The Insight**: Not all hunger is the same. Some areas need *food* (Desert), others need *better food* (Swamp).
+
+### The Visualization
+![Service Gap Matrix](Contra_Costa/png/food_deserts_matrix.png)
+
+### The Strategy
+*   **Red Dots (Bottom Left) = Deserts**: 0 stores exist. Truck required.
+*   **Gold Dots (Bottom Right) = Swamps**: Stores exist, but they sell liquor/junk. **Solution**: Partner with them to stock bananas/produce instead of sending a competing truck.
+
+### The Code Logic
+The scatter plot separates problems by **Quantity** (X-Axis) vs **Quality** (Y-Axis).
+```python
+def categorize(row):
+    if row['denominator'] == 0: return 'Desert (Needs Truck)'
+    if row['estimate'] < 10:    return 'Swamp (Needs Partnership)'
+    return 'Healthy Access'
+```
+
+---
+
+## 3. The Seasonal Pulse
 **Strategic Question**: "When should we run our biggest volunteer recruitment drive?"
 **The Insight**: Demand consistently spikes in **October** (late Summer/Fall), *not* December.
-**Standard Action**: Start recruiting in September.
-![Seasonal Pulse](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/seasonal_pulse.png)
 
-### 4. The Household Complexity Shift
+### The Visualization
+![Seasonal Pulse](Contra_Costa/png/seasonal_pulse.png)
+
+### The Strategy
+*   **Myth**: "Hunger peaks at Christmas."
+*   **Reality**: Hunger peaks in October.
+*   **Action**: Start recruiting volunteers in **September**.
+
+### The Code Logic
+We use `groupby` to average the demand for every month across 4 years to find the "Hidden Seasonality".
+```python
+# Calculate Month-over-Month % Change
+df['MoM_Change'] = df['Participants'].pct_change()
+
+# Find the Peak
+seasonality = df.groupby('MonthName')['MoM_Change'].mean()
+peak_month = seasonality.idxmax() # Returns 'Oct'
+```
+
+---
+
+## 4. The Household Complexity Shift
 **Strategic Question**: "Should we buy Family Packs or Single Servings?"
 **The Insight**: The "Persons per Household" ratio is dropping. We are seeing fewer large multi-gen families and more **isolated seniors/individuals**.
-**Standard Action**: Shift procurement toward individual meals and smaller portions.
-![Household Complexity](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/household_complexity.png)
 
-### 5. The Cost of Hunger
+### The Visualization
+![Household Complexity](Contra_Costa/png/household_complexity.png)
+
+### The Strategy
+*   **Old Way**: "Family Box" (Pasta, Rice, Whole Chicken).
+*   **New Way**: "Senior Bag" (Pop-top cans, single servings, easy prep).
+
+### The Code Logic
+We divide the total people by the total households to see the "Average Family Size".
+```python
+# Ratio: People / Households
+df['Persons_per_HH'] = df['Participants'] / df['Households']
+
+# If this line goes DOWN, families are getting SMALLER.
+```
+
+---
+
+## 5. The Cost of Hunger
 **Strategic Question**: "Why do we need more money if we are feeding the same number of people?"
-**The Insight**: The **Green Line (Cost)** is rising vertically, diverging from the **Blue Line (People)**. Inflation means every dollar creates less impact than it used to.
-![Cost of Hunger](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/cost_of_hunger.png)
+**The Insight**: The **Green Line (Cost)** is rising vertically, diverging from the **Blue Line (People)**.
 
-### 6. The Modern Crisis
+### The Visualization
+![Cost of Hunger](Contra_Costa/png/cost_of_hunger.png)
+
+### The Strategy
+*   **Donor Pitch**: "We aren't serving more people; it just costs 2x more to buy the same apple."
+*   **Proof**: Show them the gap between the lines.
+
+### The Code Logic
+We use a "Dual Axis" chart to compare two different scales (Millions of People vs Billions of Dollars).
+```python
+ax1.plot(df['Date'], df['People'], color='blue')  # Left Axis
+ax2.plot(df['Date'], df['Cost'],   color='green') # Right Axis
+```
+
+---
+
+## 6. The Modern Crisis
 **Strategic Question**: "Is this normal?"
 **The Insight**: No. We are living in a historic outlier event. Current participation levels dwarf the 1970s and 80s.
-![Modern Crisis](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/modern_crisis_history.png)
 
-### 7. The Purchasing Power Gap
+### The Visualization
+![Modern Crisis](Contra_Costa/png/modern_crisis_history.png)
+
+### The Strategy
+*   **Action**: Use this as the "Cover Page" for any Federal Grant application. It visually proves that the current system is under unprecedented stress.
+
+### The Code Logic
+We simply plotted the raw participation numbers from 1969 to 2024. The visual impact comes from using `fill_between` to make the area look "heavy" and overwhelming.
+```python
+plt.fill_between(df['Year'], df['Participants'], color='skyblue')
+# This creates the "Wall of Water" effect
+```
+
+---
+
+## 7. The Purchasing Power Gap
 **Strategic Question**: "Are benefits enough?"
-**The Insight**: Even though the government increased benefits (Green Line), the "Need" hasn't dropped. This proves that **Cost of Living (Rent)** is the real driver of hunger, not just food prices.
-![Purchasing Power](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/purchasing_power_gap.png)
+**The Insight**: Even though the government increased benefits (Green Line), the "Need" hasn't dropped.
 
----
+### The Visualization
+![Purchasing Power](Contra_Costa/png/purchasing_power_gap.png)
 
-## Part 2: The Code (How it Works)
+### The Strategy
+*   **The Narrative**: "It's not about food prices. It's about Rent."
+*   **Explanation**: If benefits represent "Food Money" and they went up, but people are still hungry, then the problem is that their "Rent Money" is eating their budget.
 
-The script `Contra_Costa/py/contra_costa_analysis.py` was written to be a **teaching tool**.
-
-### File Organizing
-We separate the logic into three distinct "Modules" so it is easy to read:
+### The Code Logic
+We highlight the recent years in **Red** to show volatility.
 ```python
-def main():
-    # 1. Geography Analysis
-    analyze_neighborhood_gaps(mrfei_file)
-    
-    # 2. Timing Analysis
-    analyze_demand_spikes_monthly(monthly_file)
-    
-    # 3. History Analysis
-    analyze_purchasing_power(annual_file)
+# Plot the main line in Green
+plt.plot(df['Year'], df['Benefit'], color='green')
+
+# Plot the "Pandemic Era" in Red
+recent = df[df['Year'] >= 2020]
+plt.plot(recent['Year'], recent['Benefit'], color='red', linewidth=3)
 ```
-
-### Beginner-Friendly Logic
-Every complex decision is broken down into simple `if/else` statements that explain the strategy:
-```python
-# DECISION TREE: What is the actual problem here?
-if std_denom == 0:
-    # PROBLEM: Absolute lack of food.
-    # SOLUTION: Truck MUST go here.
-    diagnosis = "FOOD DESERT (No stores)"
-    action = "Deploy Mobile Pantry (Primary Target)"
-```
-
-### Educational Output
-The code talks to you. Instead of just printing numbers, it prints a manual:
-```text
->> GENERATED CHART: 'seasonal_pulse.png'
-   WHY IT MATTERS: A calendar of hunger.
-   HOW TO READ: Look for where the lines consistently go UP together.
-   ACTION: Start your volunteer recruitment drive 1 month BEFORE the peak.
-```
-
----
-
-## Part 3: Deep Dive Case Study - "How did we find Concord?"
-
-You asked: *"How did you figure out that Census Tract 3552.02 was a Food Desert and that it is in Concord?"*
-
-Here is the exact **Detective Work** process:
-
-### Step 1: The Signal (The Data)
-We scanned the raw spreadsheet for rows where the `mRFEI Score` was **0.0** and `Total Stores` was **0**.
-> *Found Row #4,012:*
-> `GeotypeValue: 6013355202` | `Estimate: 0.0` | `Denominator: 0`
-
-### Step 2: The Decoding (The Code)
-The computer sees `6013355202`. We wrote code to translate that "FIPS Code" into English:
-*   `60` = California
-*   `13` = Contra Costa County
-*   `355202` = **Census Tract 3552.02**
-
-### Step 3: The Location (The Map)
-Since the dataset didn't have city names, we performed a manual geolocation lookup:
-1.  We took "Census Tract 3552.02, Contra Costa".
-2.  We searched it on a map database.
-3.  **Result**: It landed exactly on the **Monument Blvd / Detroit Ave** neighborhood in Concord.
-
-### Step 4: The Map
-This is where the "Red Dot" belongs on your deployments map:
-![Location Context](https://www.google.com/maps/vt/data=lytGH_wSjTQd_,h-c4_w_d_k-w) *(Note: Use Google Maps to verify specific street boundaries)*.
-
----
-
-## Part 4: The Math (Step-by-Step Diagnosis)
-
-You asked: *"How do we know how many stores are there?"*
-
-The raw data gives us two critical columns for every neighborhood. Here is how the code thinks:
-
-### Step 1: Count the Stores (The 'Denominator')
-Column `denominator` tells us the **Total Food Retailers**.
-*   *Example*: `denominator = 2` means there are 2 places to buy food (e.g., 1 Gas Station + 1 Liquor Store).
-
-### Step 2: Count the *Healthy* Stores (The 'Numerator')
-Column `numerator` tells us how many of those store are **Healthy** (Supermarkets/Produce).
-*   *Example*: `numerator = 0` means **ZERO** of those places are healthy.
-
-### Step 3: The Diagnosis (The Code Logic)
-The script uses a simple "Decision Tree" to classify the neighborhood:
-
-1.  **Is `Denominator == 0`?**
-    *   **Meaning**: There are 0 stores of ANY kind.
-    *   **Diagnosis**: **TRUE FOOD DESERT**.
-    *   **Action**: Send a Truck. (People literally cannot buy food here).
-
-2.  **Is `Denominator > 0` but `Score == 0`?**
-    *   **Meaning**: There are stores (e.g., 15 Liquor Stores), but 0 are healthy.
-    *   **Diagnosis**: **FOOD SWAMP**.
-    *   **Action**: Partnerships. (Don't send a truck to compete; convince the existing stores to sell bananas).
-
----
-
-## Part 5: The "Mini Map" of the 14 Deserts
-
-You asked for a **Map** and a **List** of all 14 locations. Since these are scattered across the county, we have grouped them by region.
-
-### The Map
-![Mini Map of Deserts](Contra_Costa/png/food_deserts_mini_map.png)
-
-### The Complete List (By Region)
-
-| Region | Neighborhood Name | Tract ID |
-| :--- | :--- | :--- |
-| **CENTRAL** | **Concord (Monument)** | 3552.02 |
-| CENTRAL | Concord (North) | 3551.01 |
-| CENTRAL | Martinez | 3530.01 |
-| CENTRAL | Martinez (South) | 3530.02 |
-| CENTRAL | Pleasant Hill | 3511.01 |
-| CENTRAL | Pleasant Hill (East) | 3511.03 |
-| **EAST** | **Pittsburg (Old Town)** | 3090.00 |
-| EAST | Oakley | 3400.03 |
-| EAST | Brentwood/Discovery Bay | 3040.03 |
-| EAST | Brentwood (South) | 3430.03 |
-| **SOUTH** | **San Ramon** | 3451.02 |
-| SOUTH | Blackhawk | 3551.12 |
-| SOUTH | Blackhawk (South/East) | 3551.16/17 |
-| **WEST** | **Richmond (Central)** | 3601.02 |
-| WEST | Pinole/Hercules | 3592.02 |
-| WEST | Kensington | 3920.00 |
