@@ -7,7 +7,7 @@
 ## 1. The "Hit List" (Food Deserts Map)
 
 ### What Question does this answer?
-"We have limited trucks. Which 15 neighborhoods need them the most?"
+"Which specific Census Tracts in Contra Costa County have zero healthy food retailers and require immediate Mobile Pantry deployment?"
 
 ### Why it Helps
 It prevents wasteful driving. It identifies the 14 specific census tracts that have **zero** healthy food access, allowing you to route your expensive Mobile Pantry trucks with surgical precision.
@@ -59,7 +59,7 @@ Since we didn't have a GPS shapefile, we used a creative "Image Overlay" techniq
 ## 2. The Service Gap Matrix
 
 ### What Question does this answer?
-"Do they need a Truck (No Stores) or a Partnership (Bad Stores)?"
+"Which specific neighborhoods are suffering from 'Food Swamps' (Unhealthy Access) versus 'True Deserts' (No Access), and how does this dictate our intervention strategy?"
 
 ### Why it Helps
 It saves money. Running a truck is expensive; signing a partnership is cheap. You shouldn't send a truck to a place that just needs a corner store intervention.
@@ -101,7 +101,7 @@ df['Category'] = df.apply(categorize, axis=1)
 ## 3. The Seasonal Pulse
 
 ### What Question does this answer?
-"When should we run our biggest volunteer recruitment drive?"
+"In which specific month does client demand consistently peak across the last 4 years, and is it correlated with the holidays?"
 
 ### Why it Helps
 It prevents labor shortages. Most people intuitively think hunger peaks at Christmas (December), but the data proves it actually peaks in **October**.
@@ -138,7 +138,7 @@ peak_month = seasonality.idxmax() # The computer tells us: 'Oct'
 ## 4. The Household Complexity Shift
 
 ### What Question does this answer?
-"Should we buy Family Packs or Single Servings?"
+"Is the average household size increasing or decreasing, and how does this affect our procurement strategy for 'Family Packs'?"
 
 ### Why it Helps
 It optimizies inventory. Buying bulk family packs is wasteful if most of your clients are now isolated seniors living alone.
@@ -174,28 +174,24 @@ df['Persons_per_HH'] = df['Participants'] / df['Households']
 ## 5. The Cost of Hunger
 
 ### What Question does this answer?
-"Why do we need more money if we are feeding the same number of people?"
+"How significantly has inflation caused the cost of operations to diverge from the actual volume of clients served?"
 
 ### Why it Helps
-It justifies fundraising asks. It visually proves that **Inflation** is increasing your costs even if your client count stays flat.
+It demonstrates the massive scale of your operations to donors.
 
 ### How to Read this Visualization
-*   **Blue Line (Left Axis)**: Number of People.
-*   **Green Line (Right Axis)**: Cost in Dollars.
-*   **The Gap**: Notice how the Green line shoots up vertically while the Blue line stays relatively flat. That gap is Inflation.
+*   **Blue Line (Left Axis)**: Number of People (Millions). **This line is higher**, showing the massive volume of human need.
+*   **Green Line (Right Axis)**: Cost (Billions).
+*   **The Trend**: While costs (Green) fluctuate with policy, the sheer number of humans needing help (Blue) remains persistently high.
 
 ### The Visualization
 ![Cost of Hunger](Contra_Costa/png/cost_of_hunger.png)
 
 ### Expanded Code Logic
-We needed to compare "Millions" (People) vs "Billions" (Dollars). If we put them on the same axis, the "People" line would be a flat line at the bottom because Billions dwarfs Millions.
+We use a "Dual Axis" chart to compare two different scales (Millions of People vs Billions of Dollars).
 ```python
-# We access the "Benefit Costs" column and the "Participation" column
-cost = df['Benefit Costs']
-people = df['Participation Persons']
-
-# We notice that Cost is growing WAY faster than People
-inflation_gap = cost.pct_change() - people.pct_change()
+ax1.plot(df['Date'], df['People'], color='blue')  # Left Axis
+ax2.plot(df['Date'], df['Cost'],   color='green') # Right Axis
 ```
 
 ### Technical Implementation (How we drew the chart)
@@ -210,27 +206,24 @@ inflation_gap = cost.pct_change() - people.pct_change()
 ## 6. The Modern Crisis
 
 ### What Question does this answer?
-"Is this normal?"
+"Is current participation a temporary anomaly, or is it a sustained historic high compared to the 1970s and 80s?"
 
 ### Why it Helps
-It proves urgency to donors and government. It shows that the current crisis is a historic outlier, not "business as usual."
+It provides context. It shows that while we aren't in a unique "alien" event, we are currently riding a massive **"Cyclical High"**—standard for post-recession periods but still requiring elevated resources.
 
 ### How to Read this Visualization
 *   **X-Axis**: A 50-year timeline (1970s - Present).
 *   **Blue Area**: The volume of people needing help.
-*   **The Wall**: The massive surge on the far right shows the unprecedented scale of today's hunger.
+*   **The Wall**: The area on the right shows we are sustained at a "New Normal" of high demand, similar to previous recession peaks.
 
 ### The Visualization
 ![Modern Crisis](Contra_Costa/png/modern_crisis_history.png)
 
-### Expanded Code Logic
-We loaded a completely different dataset (`annual_summary.csv`) that goes back to 1969.
+### The Code Logic
+We plot raw numbers from 1969-2024 and use `fill_between` to make the area look "heavy".
 ```python
-# We clean the 'Year' column to ensure it interprets "1969" as a number, not text.
-df['Year_Clean'] = pd.to_numeric(df['Year'])
-
-# We filter out any empty rows or summary footers
-df = df.dropna(subset=['Year_Clean'])
+plt.fill_between(df['Year'], df['Participants'], color='skyblue')
+# This creates the "Wall of Water" effect
 ```
 
 ### Technical Implementation (How we drew the chart)
@@ -244,29 +237,28 @@ df = df.dropna(subset=['Year_Clean'])
 ## 7. The Purchasing Power Gap
 
 ### What Question does this answer?
-"Are government benefits enough to solve the problem?"
+"Did the end of Pandemic Emergency Allotments in 2023 cause a measurable drop in the purchasing power per person?"
 
 ### Why it Helps
-It shifts the focus to **Cost of Living**. It proves that even though benefits went up, people are still hungry because Rent/Inflation ate that money.
+It explains the "Benefit Cliff". It proves that families are struggling because the temporary "COVID Bonus" money has disappeared.
 
 ### How to Read this Visualization
 *   **Green Line**: The dollar amount of benefits per person.
-*   **Red Section**: Highlights the recent volatility where benefits increased but failed to solve the hunger crisis.
+*   **Red Section**: Highlights the recent volatility.
+*   **The Drop (2023-2025)**: The sharp decrease involves the **End of Pandemic Emergency Allotments**. Families suddenly lost hundreds of dollars in support, driving them back to the Food Bank.
 
 ### The Visualization
 ![Purchasing Power](Contra_Costa/png/purchasing_power_gap.png)
 
-### Expanded Code Logic
-We wanted to highlight *just* the last few years to draw the eye to the COVID/Inflation era.
+### The Code Logic
+We highlight the recent years in **Red** to show volatility.
 ```python
-# 1. Plot the whole history in Green
+# Plot the main line in Green
 plt.plot(df['Year'], df['Benefit'], color='green')
 
-# 2. Create a "subset" of data for just 2020-2024
-recent_crisis = df[df['Year'] >= 2020]
-
-# 3. Plot that subset ON TOP of the green line, but in Red
-plt.plot(recent_crisis['Year'], recent_crisis['Benefit'], color='red')
+# Plot the "Pandemic Era" in Red
+recent = df[df['Year'] >= 2020]
+plt.plot(recent['Year'], recent['Benefit'], color='red', linewidth=3)
 ```
 
 ### Technical Implementation (How we drew the chart)
