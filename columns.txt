@@ -1,0 +1,299 @@
+County
+FIPS
+County Center X
+County Center Y
+Consortium
+Month
+Date
+Calendar Year
+Federal Fiscal Year
+State Fiscal Year
+Unemployment Monthly
+Federal Public Assistance Households
+Federal Non-Assistance Households
+CFAP Public Assistance Households
+CFAP Non-Assistance Households
+All Public Assistance Households
+All Non-Assistance Households
+CalFresh Households
+CalFresh Persons
+Federal Pubic Assistance Persons
+Federal Non Assistance Persons
+All Federal Persons
+CFAP Public Assistance Persons
+CFAP Non Assistance Persons
+All CFAP Persons
+All Public Assistance Persons
+All Non-Assistance Persons
+Federal Issuances
+State Issuances
+Total Issuances
+Medi-Cal Enrollement 
+Timeliness 30 day Percentage
+Timeliness Expedited Services Percentage  Monthly
+Procedural_Denials
+Applications_Approved
+Applications_Denied
+Negative Error Rate on Completed Cases
+Negative Error Rate
+Active Error Rate
+Applications Received
+Online Applications Received
+Child Only Households Monthly
+Child Only Persons
+EBT_FSP_dollars
+EBT_SNB_dollars
+EBT_TNB_dollars
+All_GCF_apps_submit
+SSA_GCF_apps_submit
+CfA_GCF_apps_submit
+CBO_GCF_apps_submit
+May19_HHs_w_Unaided
+Continuing CalFresh SSI Persons Unaided in the Household - No Reversal Determination Yet
+Continuing CalFresh Cases with at Least One SSI Person Unaided in the Household - No Reversal Determination Yet
+New Apps with at Least Some SSI - Approved
+New Apps with at Least Some SSI - Denied
+SSI Persons in New Apps Disposed
+Average Age of SSI Persons Newly Applying
+SNB Determination - Approved Cases
+Active TNB Cases
+SSI Disposed HH Language - Armenian
+SSI Disposed HH Language - Cambodian
+SSI Disposed HH Language - Cantonese
+SSI Disposed HH Language - English
+SSI Disposed HH Language - Farsi
+SSI Disposed HH Language - Korean
+SSI Disposed HH Language - Mandarin
+SSI Disposed HH Language - Other
+SSI Disposed HH Language - Russian
+SSI Disposed HH Language - Spanish
+SSI Disposed HH Language - Vietnamese
+ SSI Person Race/Ethnicity - American Indian or Alaska Native
+ SSI Person Race/Ethnicity - Asian
+ SSI Person Race/Ethnicity - Black or African American
+ SSI Person Race/Ethnicity - Hispanic
+ SSI Person Race/Ethnicity - More Than One Race/Ethnicity
+ SSI Person Race/Ethnicity - Native Hawaiian or Other Pacific Islander
+ SSI Person Race/Ethnicity - Other
+ SSI Person Race/Ethnicity - Unknown
+ SSI Person Race/Ethnicity - White
+SNB Avg SSI Persons in Household
+SNB Avg Household Size (Aided Only)
+SNB HouseHold Language Armenian
+SNB HouseHold Language Cambodian
+SNB HouseHold Language Cantonese
+SNB HouseHold Language English
+SNB HouseHold Language Farsi
+SNB HouseHold Language Korean
+SNB HouseHold Language Mandarin
+SNB HouseHold Language Other
+SNB HouseHold Language Russian
+SNB HouseHold Language Spanish
+SNB HouseHold Language Vietnamese
+Total SNB Households
+SNB - Female
+SNB - Male
+SNB SSI Person Race American Indian or Alaska Native 
+SNB SSI Person Race Asian
+SNB SSI Person Race Black or African American 
+SNB SSI Person Race Hispanic
+SNB SSI Person Race More Than One Race
+SNB SSI Person Race Native Hawain or Pacific Islander
+SNB SSI Person Race Other
+SNB SSI Person Race Unknown
+SNB SSI Person Race White
+SNB Avg Age
+SNB Disabled
+Total SSI Persons in SNB Households
+TNB Avg SSI Persons in Households
+TNB Avg Household Size (Aided Only)
+TNB Household Language Armenian
+TNB Household Language Cambodian
+TNB Household Language Cantonese
+TNB Household Language English
+TNB Household Language Farsi
+TNB Household Language Korean
+TNB Household Language Mandarin
+TNB Household Language Other
+TNB Household Language Russian
+TNB Household Language Spanish
+TNB Household Language Vietnamese
+Total TNB Households
+TNB - Female
+TNB - Male
+TNB SSI Person Race American Indian or Alaska Native 
+TNB SSI Person Race Asian
+TNB SSI Person Race Black or African American 
+TNB SSI Person Race Hispanic
+TNB SSI Person Race More Than One Race
+TNB SSI Person Race Native Hawain or Pacific Islander
+TNB SSI Person Race Other
+TNB SSI Person Race Unknown
+TNB SSI Person Race White
+TNB Avg Age
+TNB Disabled
+Total SSI  Persons in TNB Households
+SSI-only HHs of 1 added in the month
+ Average FSP benefit per HH of 1 added in the month 
+SSI-only HHs of 2 added in the month
+ Average FSP benefit per HH of 2 added in the month 
+ Average FSP benefit per person in SSI-only HHs of 2 added in the month2 
+SSI only-HHs of 3+ added in the month
+ Average FSP benefit per HH of 3+ added in the month 
+ Average FSP benefit per person in SSI-only HHs of 3+ added in the month3 
+Total SSI-only HHs added in the month
+ Average FSP benefit per HH added in the month - All SSI only HHs 
+ Average FSP benefit per person in all SSI-only HHs added in the month 
+Ineligible Denials - SSI
+Procedural Denials - SSI
+Online Apps - SSI
+Non-Online Apps - SSI
+Average Days to Dispose - SSI
+Average Approved Benefit - SSI
+Column1
+Claim Homeless Deduction - SSI 
+Claim Shelter Deduction - SSI
+Claim Standard Medical Deduction - SSI
+SSI Only - Ineligible Denials
+SSI Only Procedural Denials
+SSI Only Online Apps
+SSI Only Non Online Apps
+SSI Only Average Days to Dispose Application
+SSI Only Claim Homeless Shelter Deduction
+SSI Only Claim Shelter Deduction
+SSI Only Claim Standard Medical Deduction
+Average SNB Benefit All Households 
+SNB Households of 1 
+Average SNB Benefit in Households of 1
+SNB Households of 2
+Average SNB Benefit in Households of 2
+SNB Households of 3 or More
+Average SNB Benefit in Households of 3 or More
+Average SNB Benefit Per Person in all Households 
+Average SNB Benefit Per Person in Households of 2 
+Average SNB Benefit Per Person in Households of 3 or More 
+Average TNB Benefit in All Households 
+TNB Households of 1 
+Average TNB Benefit in Households of 1 
+TNB Households of 2
+Avearge TNB Benefit in Households of 2 
+TNB Households of 3 or more 
+Average TNB Benefit in Households of 3 or More 
+Average TNB Benefit Per Person in All Households 
+Average TNB Benefit Per Person in Households of 2 
+Average TNB Benefit Per Person in Households of 3 or More 
+SNB Discontinuances 
+TNB discontinuance 
+Applications Approved Containing at Least One Student
+Applications Denied Containing at Least One Student
+Applications Pended Containing at Least One Student
+Applications Submitted via BenefitsCal
+Applications Submitted via Code for America
+Applications Submitted via Other Online Source
+Applications Submitted via Other Source
+Denial reason - CF Missed Interview
+Denial Reason - FTP Income
+Denial Reason - Failed to Complete Determination
+Denial Reason - Ineligible
+Denial Reason - Ineligible CF Student
+Denial Reason - Unavailable
+Denial Reason - Out of the Home
+Denial Reason - Over Income
+Denial Reason - Procedural
+New Applications - ICT Transfers
+New Applications Age  17 and Under
+New Applications Age 8 to 49
+New Applications Age 50 and Over
+New Applications Age Total
+New Applications Avg Age
+New Applications Gender Female
+New Applications Gender Male
+New Applications Gender Other
+New Applications Gender Declined_to_State
+New Applications Gender Total
+New Applications Language Armenian
+New Applications Language Cambodian
+New Applications Language Cantonese
+New Applications Language English
+New Applications Langugage Farsi
+New Applications Language Korean
+New Applications Language Mandarin
+New Applications Language  Other
+New Applications Language Russian
+New Applications Language Spanish
+New Applications Language Vietnamese
+New Applications Language Missing
+New Applications Language Total
+New Applications American Indian Alaskan Native
+New Application Asian
+New Applications Black or African_American
+New Applications Hispanic
+New Applications More Than One Race/Ethnicity
+New Applications Native Hawaiian Pacific Islander 
+New Applications Other Race/Ethnicity
+New Applications Unknown Race/Ethnicity
+New Applications White
+New Applications Race/Ethnicity Total
+New Applications Exemptions- CalFresh E&T Program 
+New Applications Exemptions- CalGrant TANF
+New Applications Exemptions- CalWORKS Exempt
+New Applications Exemptions-Care of a Child
+New Applications Exemptions-Disabled
+New Applications Exemptions- Employment and Training Program
+New Applications Exemptions- Employed 20 Hours Week
+New Applications Exemptions- JTPA
+New Applications Exemptions-Other Employment and Training Program
+New Applications Exemptions- State or Local Government Training Program
+New Applications Exemptions- Title 4 Funded Employment and Training Program
+New Applications Exemptions- Tribal TANF
+New Applications Exemptions-WIOA Employment and Training Program
+New Applications Exemptions- Work Study
+Caseload ICT Applications
+Caseload Age 17 and Under
+Caseload  Age 18 to 49
+Caseload Age 50 and Over
+Caseload Age Total
+Caseload Average Age
+Caseload  Gender Female
+Caseload Gender Male
+Caseload  Gender Other
+Caseload Gender Declined to State
+Caseload Gender Total
+Caseload Language Armenian
+Caseload Language Cambodian
+Caseload Language Cantonese
+Caseload Language English
+Caseload Language Farsi
+Caseload Language Korean
+Caseload  Language Mandarin
+Caseload Language Other
+Caseload Language Russian
+Caseload Language Spanish
+Caseload Language Vietnamese
+Caseload Language Missing Data
+Caseload Language Total
+Caseload Race/Ethnicity American Indian Alaskan Native
+Caseload Race/Ethnicity Asian
+Caseload Race/Ethnicity Black or African American
+Caseload Race/Ethnicity Hispanic
+Caseload Race/Ethnicity More than one Race/Ethnicity
+Caseload Race/Ethnicity Native Hawaiian and Pacific Islander 
+Caseload Race/Ethnicity Other Race/Ethnicity
+Caseload Race/Ethnicity Unknown
+Caseload Race/Ethnicity White
+Caseload Race/Ethnicity Total
+Caseload CalFresh E&T Program 
+Caseload CalGrant TANF
+Caseload CalWORKS Exempt
+Caseload Care of a Child
+Caseload Disabled
+Caseload Employment and Training  Program
+Caseload Employed 20 Hours/Week
+Caseload JTPA
+Caseload Other Employment and Training Program
+Caseload State or Local Government  Training Program
+Caseload Title 4 Funded Employment and Training Program
+Caseload Tribal TANF
+Caseload WIOA Employment and Training Program 
+Caseload Work Study
+Caseload Total Student Count
