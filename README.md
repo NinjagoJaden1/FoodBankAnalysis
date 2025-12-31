@@ -28,16 +28,31 @@ It prevents wasteful driving. It identifies the 14 specific census tracts that h
 | **WEST** | Richmond (Central), Pinole, Kensington | **HIGH** |
 | **SOUTH** | San Ramon, Blackhawk | LOW (High Income) |
 
-### The Code Logic (How we built this)
-We didn't just guess. The script finds these specific locations using a "Decision Tree":
-1.  **Count Stores** (`denominator`): "How many places sell food?"
-2.  **Count Quality** (`numerator`): "How many of them are supermarkets?"
-3.  **The Diagnosis**:
+### Expanded Code Logic (Data Processing)
+We calculate this by filtering the raw dataset for the exact conditions of a "Food Desert":
+1.  **Filter by County**: `df['county_name'] == 'Contra Costa'`
+2.  **Filter by Type**: `df['geotype'] == 'CT'` (Census Tracts only)
+3.  **The Diagnosis Loop**:
     ```python
-    if denominator == 0:
-        diagnosis = "FOOD DESERT (No stores)"
-        action = "Deploy Mobile Pantry (Primary Target)"
+    # We loop through every single neighborhood
+    for index, row in df.iterrows():
+        total_stores = row['denominator']
+        healthy_stores = row['numerator']
+        
+        # LOGIC: If there are ZERO stores of any kind, it's a Desert.
+        if total_stores == 0:
+            diagnosis = "FOOD DESERT"
+            priority = "HIGH"
     ```
+
+### Technical Implementation (How we drew the map)
+Since we didn't have a GPS shapefile, we used a creative "Image Overlay" technique in Python:
+*   **Library**: `matplotlib.image` + `seaborn`
+*   **Technique**:
+    1.  We loaded a JPG map of the county as the "Background Layer" (`plt.imshow`).
+    2.  We manually defined the approximate lat/lon coordinates for our targets.
+    3.  We plotted the 14 "Red Dots" as a scatter plot **on top** of the image (`zorder=10` ensures they sit above the map).
+    4.  We added white outlines to the text labels (`path_effects.withStroke`) so they are readable against the busy map background.
 
 ---
 
@@ -58,14 +73,28 @@ It saves money. Running a truck is expensive; signing a partnership is cheap. Yo
 ### The Visualization
 ![Service Gap Matrix](Contra_Costa/png/food_deserts_matrix.png)
 
-### The Code Logic
-The scatter plot separates problems by Quantity vs Quality.
+### Expanded Code Logic
+We created a custom function `categorize(row)` and applied it to the dataframe to create a new column called `Category`.
 ```python
 def categorize(row):
-    if row['denominator'] == 0: return 'Desert (Needs Truck)'
-    if row['estimate'] < 10:    return 'Swamp (Needs Partnership)'
+    # Logic 1: Absolute lack of infrastructure
+    if row['denominator'] == 0: 
+        return 'Desert (Needs Truck)'
+        
+    # Logic 2: Infrastructure exists, but quality is poor
+    if row['estimate'] < 10:    
+        return 'Swamp (Needs Partnership)'
+        
     return 'Healthy Access'
+
+# We apply this logic to every single row
+df['Category'] = df.apply(categorize, axis=1)
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `seaborn`
+*   **Function**: `sns.scatterplot()`
+*   **Key Feature**: `hue='Category'`. This argument automatically colors the dots based on the column we created above. We then used a custom `palette` dictionary to force "Deserts" to be Red and "Swamps" to be Gold, ensuring the visual matches our strategic urgency.
 
 ---
 
@@ -85,16 +114,24 @@ It prevents labor shortages. Most people intuitively think hunger peaks at Chris
 ### The Visualization
 ![Seasonal Pulse](Contra_Costa/png/seasonal_pulse.png)
 
-### The Code Logic
-We use `groupby` to average the demand for every month across 4 years to find the "Hidden Seasonality".
+### Expanded Code Logic
+We needed to prove that the spike happens *every* year, not just once.
 ```python
-# Calculate Month-over-Month % Change
+# 1. Extract the "Month Name" from the date (e.g., "2023-10-01" -> "Oct")
+df['MonthName'] = df['Date'].dt.strftime('%b')
+
+# 2. Calculate the % change from the previous month
 df['MoM_Change'] = df['Participants'].pct_change()
 
-# Find the Peak
+# 3. Average this change across all 4 years to find the "Typical Year"
 seasonality = df.groupby('MonthName')['MoM_Change'].mean()
-peak_month = seasonality.idxmax() # Returns 'Oct'
+peak_month = seasonality.idxmax() # The computer tells us: 'Oct'
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `seaborn`
+*   **Function**: `sns.lineplot()`
+*   **Key Feature**: `hue='Year'`. By mapping the "Year" column to the color (hue), Seaborn automatically draws 4 separate lines (one for 2021, 2022, etc.) on the same chart. This allows us to visually compare year-over-year patterns and confirm that the "October Spike" is a repeating phenomenon.
 
 ---
 
@@ -114,14 +151,23 @@ It optimizies inventory. Buying bulk family packs is wasteful if most of your cl
 ### The Visualization
 ![Household Complexity](Contra_Costa/png/household_complexity.png)
 
-### The Code Logic
-We divide the total people by the total households to see the "Average Family Size".
+### Expanded Code Logic
+We derived a new metric from two separate columns to create an "Efficiency Ratio".
 ```python
-# Ratio: People / Households
+# Column A: Total Participants (Individual Humans)
+# Column B: Total Households (Family Units)
+
+# The Math: People divided by Households
 df['Persons_per_HH'] = df['Participants'] / df['Households']
 
-# If this line goes DOWN, families are getting SMALLER.
+# Insight: If Participants went up, but Households went up FASTER, 
+# then this ratio goes DOWN.
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `matplotlib.pyplot`
+*   **Function**: `plt.plot()`
+*   **Key Feature**: A simple time-series line chart. We added `marker='o'` to show the specific data points for each month, making it clear that this is concrete monthly data, not a smoothed trend line.
 
 ---
 
@@ -141,12 +187,23 @@ It justifies fundraising asks. It visually proves that **Inflation** is increasi
 ### The Visualization
 ![Cost of Hunger](Contra_Costa/png/cost_of_hunger.png)
 
-### The Code Logic
-We use a "Dual Axis" chart to compare two different scales (Millions of People vs Billions of Dollars).
+### Expanded Code Logic
+We needed to compare "Millions" (People) vs "Billions" (Dollars). If we put them on the same axis, the "People" line would be a flat line at the bottom because Billions dwarfs Millions.
 ```python
-ax1.plot(df['Date'], df['People'], color='blue')  # Left Axis
-ax2.plot(df['Date'], df['Cost'],   color='green') # Right Axis
+# We access the "Benefit Costs" column and the "Participation" column
+cost = df['Benefit Costs']
+people = df['Participation Persons']
+
+# We notice that Cost is growing WAY faster than People
+inflation_gap = cost.pct_change() - people.pct_change()
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `matplotlib`
+*   **Key Feature**: **Dual Axis (`twinx`)**.
+    1.  We created the main axis (`ax1`) for People (Blue).
+    2.  We created a "Twin" axis (`ax2 = ax1.twinx()`) that shares the same X-Axis (Date) but has an independent Y-Axis on the right side for Dollars (Green).
+    3.  This allows us to overlay the two trends perfectly to show the divergence.
 
 ---
 
@@ -166,12 +223,21 @@ It proves urgency to donors and government. It shows that the current crisis is 
 ### The Visualization
 ![Modern Crisis](Contra_Costa/png/modern_crisis_history.png)
 
-### The Code Logic
-We plot raw numbers from 1969-2024 and use `fill_between` to make the area look "heavy" and overwhelming.
+### Expanded Code Logic
+We loaded a completely different dataset (`annual_summary.csv`) that goes back to 1969.
 ```python
-plt.fill_between(df['Year'], df['Participants'], color='skyblue')
-# This creates the "Wall of Water" effect
+# We clean the 'Year' column to ensure it interprets "1969" as a number, not text.
+df['Year_Clean'] = pd.to_numeric(df['Year'])
+
+# We filter out any empty rows or summary footers
+df = df.dropna(subset=['Year_Clean'])
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `matplotlib`
+*   **Function**: `plt.fill_between()`
+*   **Key Feature**: Instead of a simple line, we used `fill_between` to color the area under the curve (`color='skyblue'`).
+*   **Design Choice**: This was intentional. A solid "Wall of Blue" psychologically feels heavier and more significant than a thin line, visually reinforcing the concept of "Volume" and "Crisis".
 
 ---
 
@@ -190,13 +256,20 @@ It shifts the focus to **Cost of Living**. It proves that even though benefits w
 ### The Visualization
 ![Purchasing Power](Contra_Costa/png/purchasing_power_gap.png)
 
-### The Code Logic
-We highlight the recent years in **Red** to show volatility.
+### Expanded Code Logic
+We wanted to highlight *just* the last few years to draw the eye to the COVID/Inflation era.
 ```python
-# Plot the main line in Green
+# 1. Plot the whole history in Green
 plt.plot(df['Year'], df['Benefit'], color='green')
 
-# Plot the "Pandemic Era" in Red
-recent = df[df['Year'] >= 2020]
-plt.plot(recent['Year'], recent['Benefit'], color='red', linewidth=3)
+# 2. Create a "subset" of data for just 2020-2024
+recent_crisis = df[df['Year'] >= 2020]
+
+# 3. Plot that subset ON TOP of the green line, but in Red
+plt.plot(recent_crisis['Year'], recent_crisis['Benefit'], color='red')
 ```
+
+### Technical Implementation (How we drew the chart)
+*   **Library**: `matplotlib`
+*   **Key Feature**: **Layering**. By calling `plt.plot` twice on the same figure, we layered the "Red Line" exactly on top of the "Green Line".
+*   **Design Choice**: We made the Red line thicker (`linewidth=3`) to make it pop out as the "Danger Zone" segment of the history.
