@@ -1,4 +1,24 @@
+"""
+=============================================================================
+TITLE: STATEWIDE TREND ANALYSIS (CALIFORNIA)
+=============================================================================
+DESCRIPTION:
+This script performs a high-level analysis of CalFresh participation trends
+across the entire State of California. It serves as the "Macro" view
+before digging into the "Micro" Contra Costa analysis.
 
+KEY ANALYSES:
+1. Trend Detection: Plots the long-term rise in participation.
+2. Spike Analysis: Detects specific months with Z-Score > 2 deviations,
+   identifying sudden shocks (like Pandemic onset).
+3. Decomposition: Breaks the time-series into Trend, Seasonality, and Noise.
+
+OUTPUTS:
+- statewide_trend.png (General line chart)
+- demand_spikes.png (Red dot overlay on anomalies)
+- seasonality_decomposition.png (Statsmodels 4-panel view)
+=============================================================================
+"""
 import pandas as pd  # Import pandas for data manipulation (DataFrames)
 import numpy as np   # Import numpy for numerical operations
 import matplotlib.pyplot as plt  # Import matplotlib for creating plots

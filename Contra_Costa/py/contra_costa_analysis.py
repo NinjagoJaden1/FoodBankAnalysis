@@ -1,3 +1,31 @@
+"""
+=============================================================================
+TITLE: CONTRA COSTA STRATEGIC ANALYSIS ENGINE
+=============================================================================
+DESCRIPTION:
+This is the core analysis script for the Contra Costa County Case Study.
+It transforms raw SNAP/CalFresh data into 7 strategic visualizations used
+to guide operational pivots (Logistics, HR, Procurement, Advocacy).
+
+KEY FUNCTIONS & LOGIC:
+1. Food Desert Identification: Filters for tracts with 0 healthy stores.
+2. Service Gap Categorization: Labels areas as 'Deserts' vs 'Swamps'.
+3. Weighted Seasonality: Calculates demand peaks using a weighted average
+   (prioritizing 2024/2025) to determine the optimal volunteer hiring window.
+4. Procurement Analysis: Calculates 'Persons per Household' to guide inventory.
+5. Inflation Analysis: Compares Benefit vs Cost trends to aid advocacy.
+
+INPUTS:
+- ../csv/modified-retail-food-environment-index-data.xlsx - modified-retail-food-environment-index-data.xlsx.csv (Store Data)
+- ../csv/snap-4fymonthly-12.xlsx - Sheet1.csv (Monthly Trends)
+- ../csv/snap-annualsummary-12.xlsx - Sheet1.csv (50-Year History)
+
+OUTPUTS (Saved to ../png/):
+- food_desert_ranking.png, food_deserts_matrix.png
+- seasonal_pulse.png, household_complexity.png
+- cost_of_hunger.png, modern_crisis_history.png, purchasing_power_gap.png
+=============================================================================
+"""
 
 import pandas as pd  # PANDAS: The "Excel for Python". We use this to load tables and math.
 import numpy as np   # NUMPY: A library for fast math operations.

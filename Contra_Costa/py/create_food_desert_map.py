@@ -1,4 +1,25 @@
 
+"""
+=============================================================================
+TITLE: FOOD DESERT MAP GENERATOR (METRO STYLE)
+=============================================================================
+DESCRIPTION:
+This utility script generates a "Metro Map" style visualization of the
+14 confirmed Food Deserts in Contra Costa County.
+
+TECHNICAL IMPLEMENTATION:
+Since we lack a GPS Shapefile for the county, this script uses an
+"Image Overlay" technique:
+1. Loads a static JPG map of Contra Costa County.
+2. Uses manually defined relative coordinates map_coords to calculate
+   where cities fall on the image grid.
+3. Plots the 14 High-Priority desert tracts as specific points.
+4. Assigns regional groupings (West, Central, East) for logistics planning.
+
+OUTPUT:
+- ../png/food_deserts_mini_map.png (The final visual used in the README)
+=============================================================================
+"""
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
