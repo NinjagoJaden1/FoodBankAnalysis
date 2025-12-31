@@ -6,10 +6,10 @@
 
 ## Part 1: The Visualizations (The "Story")
 
-### 1. The "Hit List" (Food Desert Ranking)
+### 1. The "Hit List" (Map of Food Deserts)
 **Strategic Question**: "We have limited trucks. Which 15 neighborhoods need them the most?"
 **The Insight**: These Census Tracts have the absolute lowest Healthy Food Access Scores (0.0). They are your primary targets.
-![Food Desert Ranking](/Users/jadencheung/FoodBanksAnalysis/Contra_Costa/png/food_desert_ranking.png)
+![Food Deserts Map](Contra_Costa/png/food_deserts_mini_map.png)
 
 ### 2. The Service Gap Matrix
 **Strategic Question**: "Do they need a Truck (No Stores) or a Partnership (Bad Stores)?"
