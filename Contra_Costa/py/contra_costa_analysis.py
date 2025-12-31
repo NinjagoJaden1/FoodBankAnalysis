@@ -247,12 +247,54 @@ def analyze_demand_spikes_monthly(filepath):
         # Calculate Month-over-Month % Change
         monthly_df['MoM_Change'] = monthly_df[part_persons_col].pct_change()
         
-        # Find the Peak Month
-        seasonality = monthly_df.groupby('MonthName')['MoM_Change'].mean()
-        peak_month = seasonality.idxmax()
+        # Calculate Month-over-Month % Change
+        monthly_df['MoM_Change'] = monthly_df[part_persons_col].pct_change()
         
-        print(f"\n>> INSIGHT: The 'October Surprise'")
-        print(f"   Data confirms demand consistently SPIKES in {peak_month}, not December.")
+        # --- NEW LOGIC: WEIGHTED SEASONALITY ---
+        # User Feedback: "Demand doesn't always surge in October... weight modern years more."
+        # We will assign weights to each year to prioritize recent trends (2024/2025).
+        
+        def calculate_weighted_seasonality(sub_df):
+            # Define Weights
+            weights = {
+                2025: 1.5,
+                2024: 1.2,
+                2023: 1.0,
+                2022: 0.8,
+                2021: 0.6
+            }
+            
+            total_weighted_change = 0
+            total_weights = 0
+            
+            for index, row in sub_df.iterrows():
+                year = row['Year']
+                # Default weight is 1.0 if year not in dict
+                w = weights.get(year, 1.0)
+                
+                # Check for NaN in MoM_Change
+                if pd.notna(row['MoM_Change']):
+                    total_weighted_change += row['MoM_Change'] * w
+                    total_weights += w
+            
+            if total_weights == 0:
+                return 0
+            
+            return total_weighted_change / total_weights
+
+        # Group by Month Name and apply our weighted custom function
+        seasonality = monthly_df.groupby('MonthName').apply(calculate_weighted_seasonality)
+        
+        # Re-sort to be Jan-Dec (otherwise it sorts alphabetically Apr, Aug...)
+        month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        seasonality = seasonality.reindex(month_order)
+        
+        peak_month = seasonality.idxmax()
+        peak_value = seasonality.max() * 100 # Convert to %
+        
+        print(f"\n>> INSIGHT: The 'Weighted Seasonal Peak'")
+        print(f"   After weighting 2024-2025 more heavily, the Peak Demand Month is: {peak_month}")
+        print(f"   (Weighted Avg Surge: +{peak_value:.1f}%)")
 
         # --- VISUALIZATION 3: Seasonal Pulse (Multi-Year Line Chart) ---
         plt.figure(figsize=(10, 6))
