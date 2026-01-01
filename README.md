@@ -15,12 +15,11 @@ A "Cheat Sheet" summarizing the strategic finding of every visualization in this
 | **2** | **Service Gap Matrix** | Who needs a Truck vs a Partner? | **Deserts** need trucks; **Swamps** need partners. | **Stop sending trucks** to "Swamps" (Gold Dots); sign partners instead. |
 | **3** | **Seasonal Pulse** | When does demand spike? | **October** is the peak month (every year). | **Recruit volunteers in September** to prepare for the surge. |
 | **4** | **Household Complexity** | Are families getting bigger? | **No.** Household size is shrinking (Seniors/Singles). | **Buy fewer Family Packs**; buy more pop-top single servings. |
-| **5** | **Cost of Hunger** | Why are costs exploding? | **Inflation.** Costs (Green) are outpacing People (Blue). | **Show this chart to Donors** to explain the budget gap. |
-| **6** | **Modern Crisis** | Is this normal? | **No.** We are at a historic 50-year high. | **Validate the crisis** in grant applications using this 50-year view. |
-| **7** | **Purchasing Power** | Why are people poorer? | **The Cliff.** Benefits dropped sharply in 2023. | **Advocate for policy change** using the "Red Line" drop. |
-| **8A** | **Recession Lag** | When does the wave hit? | **4-6 Months** after Unemployment spikes. | **Stock up inventory** 4 months after you see bad economic news. |
-| **8B** | **Heat Calendar** | Is the surge random? | **No.** It is a solid vertical band in Oct/Nov. | **Standardize October** as "All Hands on Deck" month. |
-| **8C** | **Swamp Density** | Where is the risk clustered? | **Central/East County** have the highest density of bad options. | **Focus Health Education** programs in these specific zones. |
+| **5** | **Modern Crisis** | Is this normal? | **No.** We are at a historic 50-year high. | **Validate the crisis** in grant applications using this 50-year view. |
+| **6** | **Purchasing Power** | Why are people poorer? | **The Cliff.** Benefits dropped sharply in 2023. | **Advocate for policy change** using the "Red Line" drop. |
+| **7A** | **Recession Lag** | When does the wave hit? | **4-6 Months** after Unemployment spikes. | **Stock up inventory** 4 months after you see bad economic news. |
+| **7B** | **Heat Calendar** | Is the surge random? | **No.** It is a solid vertical band in Oct/Nov. | **Standardize October** as "All Hands on Deck" month. |
+| **7C** | **Swamp Density** | Where is the risk clustered? | **Central/East County** have the highest density of bad options. | **Focus Health Education** programs in these specific zones. |
 
 ---
 
@@ -33,17 +32,16 @@ Here is exactly how specific Food Bank Directors can use these visuals to make t
 *   **The Benefit**: You stop wasting gas. You stop sending expensive trucks to places that don't need them.
 
 ### 💰 For the Development Director (Fundraising)
-*   **Use Visual 5 (Cost of Hunger)**: To prove to donors that your budget increase is due to *Inflation*, not waste.
-*   **Use Visual 6 (Modern Crisis)**: To win grants by showing we are in a historic "50-Year High" of need.
+*   **Use Visual 5 (Modern Crisis)**: To win grants by showing we are in a historic "50-Year High" of need.
 *   **The Benefit**: You win more grants. You provide impartial data that validates your funding requests.
 
 ### 🏛️ For the Advocacy Director
-*   **Use Visual 7 (Purchasing Power)**: To show politicians the "Benefit Cliff".
+*   **Use Visual 6 (Purchasing Power)**: To show politicians the "Benefit Cliff".
 *   **The Benefit**: You change policy. You have visual proof that government cuts directly caused the current hunger crisis.
 
 ### ⚙️ For the Operations Director
 *   **Use Visual 3 (Seasonal Pulse)**: To schedule volunteers in September for the October rush.
-*   **Use Visual 8A (Recession Lag)**: To order inventory 4 months before a recession hits.
+*   **Use Visual 7A (Recession Lag)**: To order inventory 4 months before a recession hits.
 *   **The Benefit**: You are never caught off guard. You have a "Crystal Ball" for demand.
 
 ---
@@ -162,35 +160,28 @@ It prevents **"staffing surprises"**.
 
 ### How to Read this Visualization
 *   **X-Axis**: Months of the year (Jan-Dec).
-*   **Y-Axis**: Number of Participants.
-*   **Trend**: Look for the consistent "Spike" in **October** (Oct) across every colored line (Year).
+*   **Y-Axis**: Average Number of Participants.
+*   **The Line**: This is the **Average Trend** over 4 years.
+*   **The Shaded Blue Area**: This is the **"Confidence Interval"** (The Variation). It shows the range between the lowest and highest years.
+    *   *Narrow Shade* = Very predictable (Consistent every year).
+    *   *Wide Shade* = Unpredictable (Varies widely year-to-year).
+*   **Trend**: Look for the peak in **October**. This proves that on average, October is the busiest month.
 
 ### The Visualization
 ![Seasonal Pulse](Contra_Costa/png/seasonal_pulse.png)
 
 ### Expanded Code Logic
-We needed to prove that the spike happens *every* year, not just once. We applied a **Weighted Average** to prioritize recent data (2025/2024) over older data (2021).
+We needed to prove the "True Seasonality" by removing the noise of individual years. We calculated the **Average Participation** for each month layout out the underlying pattern.
 ```python
-# Weights: 2025 (1.5x), 2024 (1.2x), 2021 (0.6x)
-def calculate_weighted_seasonality(df):
-    weights = {2025: 1.5, 2024: 1.2, 2021: 0.6}
-    weighted_sum = 0
-    total_weight = 0
-    
-    for year in df['Year'].unique():
-        w = weights.get(year, 1.0)
-        weighted_sum += df[df['Year']==year]['MoM_Change'] * w
-        total_weight += w
-        
-    return weighted_sum / total_weight
-
-# Result: Even with heavy weighting on 2025, the peak remains OCTOBER.
+# We group by Month and calculate the MEAN to find the "Typical Year"
+sns.lineplot(data=df, x='Month', y='Participants')
+# Seaborn automatically draws the Average Line + 95% Confidence Interval
 ```
 
 ### Technical Implementation (How we drew the chart)
 *   **Library**: `seaborn`
 *   **Function**: `sns.lineplot()`
-*   **Key Feature**: `hue='Year'`. By mapping the "Year" column to the color (hue), Seaborn automatically draws 4 separate lines (one for 2021, 2022, etc.) on the same chart. This allows us to visually compare year-over-year patterns and confirm that the "October Spike" is a repeating phenomenon.
+*   **Key Feature**: We removed the `hue='Year'` argument. By doing this, Seaborn automatically aggregates all the data points for "January" (2021, 2022, 2023, 2024) and plots the **Mean** (Average) as the solid line, and the **Confidence Interval** as the shaded blue region. This gives us the "One True Seasonal Line".
 
 ---
 
@@ -234,41 +225,10 @@ df['Persons_per_HH'] = df['Participants'] / df['Households']
 
 ---
 
-## 5. The Cost of Hunger
-
-### What Question does this answer?
-"How significantly has inflation caused the cost of operations to diverge from the actual volume of clients served?"
-
-### Why it Helps (Fundraising Narrative)
-It changes the donor conversation from **"Efficiency"** to **"Scale"**.
-*   **The Problem**: Donors see your rising budget and ask "Why are you spending so much?"
-*   **The Answer**: Use this chart to prove that "Cost" (Green) is rising due to external inflation, while "Human Need" (Blue) remains undeniably high. It validates that your budget growth is driven by **market forces**, not bloat.
-
-### How to Read this Visualization
-*   **Blue Line (Left Axis)**: Number of People (Millions). **This line is higher**, showing the massive volume of human need.
-*   **Green Line (Right Axis)**: Cost (Billions).
-*   **The Trend**: While costs (Green) fluctuate with policy, the sheer number of humans needing help (Blue) remains persistently high.
-
-### The Visualization
-![Cost of Hunger](Contra_Costa/png/cost_of_hunger.png)
-
-### Expanded Code Logic
-We use a "Dual Axis" chart to compare two different scales (Millions of People vs Billions of Dollars).
-```python
-ax1.plot(df['Date'], df['People'], color='blue')  # Left Axis
-ax2.plot(df['Date'], df['Cost'],   color='green') # Right Axis
-```
-
-### Technical Implementation (How we drew the chart)
-*   **Library**: `matplotlib`
-*   **Key Feature**: **Dual Axis (`twinx`)**.
-    1.  We created the main axis (`ax1`) for People (Blue).
-    2.  We created a "Twin" axis (`ax2 = ax1.twinx()`) that shares the same X-Axis (Date) but has an independent Y-Axis on the right side for Dollars (Green).
-    3.  This allows us to overlay the two trends perfectly to show the divergence.
-
 ---
 
-## 6. The Modern Crisis
+## 5. The Modern Crisis
+
 
 ### What Question does this answer?
 "Is current participation a temporary anomaly, or is it a sustained historic high compared to the 1970s and 80s?"
@@ -301,7 +261,7 @@ plt.fill_between(df['Year'], df['Participants'], color='skyblue')
 
 ---
 
-## 7. The Purchasing Power Gap
+## 6. The Purchasing Power Gap
 
 ### What Question does this answer?
 "Did the end of Pandemic Emergency Allotments in 2023 cause a measurable drop in the purchasing power per person?"
@@ -342,7 +302,7 @@ plt.plot(recent['Year'], recent['Benefit'], color='red', linewidth=3)
 
 ---
 
-## 8. Deep Dive: Advanced Analytics
+## 7. Deep Dive: Advanced Analytics
 
 To answer your deeper strategic questions about **Economic Stress**, **True Seasonality**, and **Geographic Density**, we built a custom "Advanced Analytics" engine.
 
