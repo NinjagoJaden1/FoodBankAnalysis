@@ -324,16 +324,16 @@ def analyze_demand_spikes_monthly(filepath):
         print(f"   After weighting 2024-2025 more heavily, the Peak Demand Month is: {peak_month}")
         print(f"   (Weighted Avg Surge: +{peak_value:.1f}%)")
 
-        # --- VISUALIZATION 3: Seasonal Pulse (Multi-Year Line Chart) ---
+        # --- VISUALIZATION 3: Average Seasonal Pulse (Aggregated) ---
         plt.figure(figsize=(10, 6))
         
-        # Plot lines: One line per Year
-        sns.lineplot(data=monthly_df, x='MonthName', y=part_persons_col, hue='Year', marker='o', palette='tab10')
+        # Plot: Seaborn defaults to MEAN with 95% Confidence Interval when hue is removed
+        # This creates the "One Average Line" the user requested.
+        sns.lineplot(data=monthly_df, x='MonthName', y=part_persons_col, marker='o', color='tab:blue', linewidth=3)
         
-        plt.title("The Seasonal Pulse: SNAP Participation by Month")
-        plt.ylabel("Participants")
+        plt.title("Average Seasonal Pulse (4-Year Trend)")
+        plt.ylabel("Average Participants")
         plt.xlabel("Month")
-        plt.legend(title='Year')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig("seasonal_pulse.png")
@@ -342,8 +342,8 @@ def analyze_demand_spikes_monthly(filepath):
         print("\n" + "-"*60)
         print("VISUAL GENERATED: 'seasonal_pulse.png'")
         print("-"*60)
-        print("WHAT IT IS: A calendar of hunger.")
-        print("HOW TO READ: Look for where the lines consistently go UP together.")
+        print("WHAT IT IS: The 'Average Year'.")
+        print("HOW TO READ: The line shows the typical monthly demand averaged over 4 years.")
         print("ACTION: Start your volunteer recruitment drive 1 month BEFORE the peak.")
         print(f"        (i.e., Recruit in September for the {peak_month} rush).")
 
@@ -372,36 +372,10 @@ def analyze_demand_spikes_monthly(filepath):
         else:
             print("   -> Buy more 'Family Packs'.")
 
-        # --- VISUALIZATION 5: The Cost of Hunger (Dual Axis) ---
-        # Dual-Axis means we plot two different things (People vs Dollars) on the same chart.
-        fig, ax1 = plt.subplots(figsize=(12, 6))
+        # [VISUALIZATION 5 REMOVED AS REQUESTED]
+        # User Feedback: "Common sense, no chart needed."
         
-        # Left Axis: People (Blue)
-        color = 'tab:blue'
-        ax1.set_xlabel('Date')
-        ax1.set_ylabel('Participants (Millions)', color=color)
-        ax1.plot(monthly_df['parsed_date'], monthly_df[part_persons_col] / 1e6, color=color, label='People', linewidth=2)
-        ax1.tick_params(axis='y', labelcolor=color)
-        
-        # Right Axis: Cost (Green)
-        ax2 = ax1.twinx()
-        color = 'tab:green'
-        ax2.set_ylabel('Total Benefit Cost (Billions $)', color=color)  
-        ax2.plot(monthly_df['parsed_date'], monthly_df[cost_col] / 1e9, color=color, linestyle='--', label='Cost', linewidth=2)
-        ax2.tick_params(axis='y', labelcolor=color)
-        
-        plt.title("The Cost of Hunger: Demand vs. Spending")
-        plt.tight_layout()
-        plt.savefig("cost_of_hunger.png")
-        
-        # --- EXPLANATION 5 ---
-        print("\n" + "-"*60)
-        print("VISUAL GENERATED: 'cost_of_hunger.png'")
-        print("-"*60)
-        print("WHAT IT IS: The 'ROI' of benefits.")
-        print("HOW TO READ: If Green (Cost) goes up faster than Blue (People), inflation is high.")
-        print("ACTION: Use this chart in Donor Letters to explain why you need more money")
-        print("        just to feed the SAME number of people.")
+        return monthly_df
         
         return monthly_df
 
