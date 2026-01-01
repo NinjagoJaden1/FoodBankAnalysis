@@ -1,4 +1,23 @@
+"""
+=============================================================================
+TITLE: PREDICTIVE FORECASTING ENGINE
+=============================================================================
+DESCRIPTION:
+This script uses the 'Prophet' library (or similar time-series logic) to
+forecast future demand based on historical data.
 
+PURPOSE:
+To answer the question: "What will demand look like in 6 months?"
+It is used to warn the operations team of incoming surges that fall outside
+of standard seasonal patterns.
+
+KEY COMPONENTS:
+1. Data Preparation: Formats dates for time-series modeling.
+2. Model Training: Fits specific changepoints in the history.
+3. Future DataFrame: Extends the timeline 3-6 months out.
+4. Visualization: Plots the 'Forecast Cone' (Confidence Interval).
+=============================================================================
+"""
 import pandas as pd  # Import pandas for data manipulation
 import numpy as np   # Import numpy for math
 import matplotlib.pyplot as plt  # Import plotting library

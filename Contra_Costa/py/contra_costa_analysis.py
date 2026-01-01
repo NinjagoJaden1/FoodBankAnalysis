@@ -1,3 +1,31 @@
+"""
+=============================================================================
+TITLE: CONTRA COSTA STRATEGIC ANALYSIS ENGINE
+=============================================================================
+DESCRIPTION:
+This is the core analysis script for the Contra Costa County Case Study.
+It transforms raw SNAP/CalFresh data into 7 strategic visualizations used
+to guide operational pivots (Logistics, HR, Procurement, Advocacy).
+
+KEY FUNCTIONS & LOGIC:
+1. Food Desert Identification: Filters for tracts with 0 healthy stores.
+2. Service Gap Categorization: Labels areas as 'Deserts' vs 'Swamps'.
+3. Weighted Seasonality: Calculates demand peaks using a weighted average
+   (prioritizing 2024/2025) to determine the optimal volunteer hiring window.
+4. Procurement Analysis: Calculates 'Persons per Household' to guide inventory.
+5. Inflation Analysis: Compares Benefit vs Cost trends to aid advocacy.
+
+INPUTS:
+- ../csv/modified-retail-food-environment-index-data.xlsx - modified-retail-food-environment-index-data.xlsx.csv (Store Data)
+- ../csv/snap-4fymonthly-12.xlsx - Sheet1.csv (Monthly Trends)
+- ../csv/snap-annualsummary-12.xlsx - Sheet1.csv (50-Year History)
+
+OUTPUTS (Saved to ../png/):
+- food_desert_ranking.png, food_deserts_matrix.png
+- seasonal_pulse.png, household_complexity.png
+- cost_of_hunger.png, modern_crisis_history.png, purchasing_power_gap.png
+=============================================================================
+"""
 
 import pandas as pd  # PANDAS: The "Excel for Python". We use this to load tables and math.
 import numpy as np   # NUMPY: A library for fast math operations.
@@ -247,23 +275,65 @@ def analyze_demand_spikes_monthly(filepath):
         # Calculate Month-over-Month % Change
         monthly_df['MoM_Change'] = monthly_df[part_persons_col].pct_change()
         
-        # Find the Peak Month
-        seasonality = monthly_df.groupby('MonthName')['MoM_Change'].mean()
-        peak_month = seasonality.idxmax()
+        # Calculate Month-over-Month % Change
+        monthly_df['MoM_Change'] = monthly_df[part_persons_col].pct_change()
         
-        print(f"\n>> INSIGHT: The 'October Surprise'")
-        print(f"   Data confirms demand consistently SPIKES in {peak_month}, not December.")
+        # --- NEW LOGIC: WEIGHTED SEASONALITY ---
+        # User Feedback: "Demand doesn't always surge in October... weight modern years more."
+        # We will assign weights to each year to prioritize recent trends (2024/2025).
+        
+        def calculate_weighted_seasonality(sub_df):
+            # Define Weights
+            weights = {
+                2025: 1.5,
+                2024: 1.2,
+                2023: 1.0,
+                2022: 0.8,
+                2021: 0.6
+            }
+            
+            total_weighted_change = 0
+            total_weights = 0
+            
+            for index, row in sub_df.iterrows():
+                year = row['Year']
+                # Default weight is 1.0 if year not in dict
+                w = weights.get(year, 1.0)
+                
+                # Check for NaN in MoM_Change
+                if pd.notna(row['MoM_Change']):
+                    total_weighted_change += row['MoM_Change'] * w
+                    total_weights += w
+            
+            if total_weights == 0:
+                return 0
+            
+            return total_weighted_change / total_weights
 
-        # --- VISUALIZATION 3: Seasonal Pulse (Multi-Year Line Chart) ---
+        # Group by Month Name and apply our weighted custom function
+        seasonality = monthly_df.groupby('MonthName').apply(calculate_weighted_seasonality)
+        
+        # Re-sort to be Jan-Dec (otherwise it sorts alphabetically Apr, Aug...)
+        month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        seasonality = seasonality.reindex(month_order)
+        
+        peak_month = seasonality.idxmax()
+        peak_value = seasonality.max() * 100 # Convert to %
+        
+        print(f"\n>> INSIGHT: The 'Weighted Seasonal Peak'")
+        print(f"   After weighting 2024-2025 more heavily, the Peak Demand Month is: {peak_month}")
+        print(f"   (Weighted Avg Surge: +{peak_value:.1f}%)")
+
+        # --- VISUALIZATION 3: Average Seasonal Pulse (Aggregated) ---
         plt.figure(figsize=(10, 6))
         
-        # Plot lines: One line per Year
-        sns.lineplot(data=monthly_df, x='MonthName', y=part_persons_col, hue='Year', marker='o', palette='tab10')
+        # Plot: Seaborn defaults to MEAN with 95% Confidence Interval when hue is removed
+        # This creates the "One Average Line" the user requested.
+        sns.lineplot(data=monthly_df, x='MonthName', y=part_persons_col, marker='o', color='tab:blue', linewidth=3)
         
-        plt.title("The Seasonal Pulse: SNAP Participation by Month")
-        plt.ylabel("Participants")
+        plt.title("Average Seasonal Pulse (4-Year Trend)")
+        plt.ylabel("Average Participants")
         plt.xlabel("Month")
-        plt.legend(title='Year')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig("seasonal_pulse.png")
@@ -272,8 +342,8 @@ def analyze_demand_spikes_monthly(filepath):
         print("\n" + "-"*60)
         print("VISUAL GENERATED: 'seasonal_pulse.png'")
         print("-"*60)
-        print("WHAT IT IS: A calendar of hunger.")
-        print("HOW TO READ: Look for where the lines consistently go UP together.")
+        print("WHAT IT IS: The 'Average Year'.")
+        print("HOW TO READ: The line shows the typical monthly demand averaged over 4 years.")
         print("ACTION: Start your volunteer recruitment drive 1 month BEFORE the peak.")
         print(f"        (i.e., Recruit in September for the {peak_month} rush).")
 
@@ -302,36 +372,10 @@ def analyze_demand_spikes_monthly(filepath):
         else:
             print("   -> Buy more 'Family Packs'.")
 
-        # --- VISUALIZATION 5: The Cost of Hunger (Dual Axis) ---
-        # Dual-Axis means we plot two different things (People vs Dollars) on the same chart.
-        fig, ax1 = plt.subplots(figsize=(12, 6))
+        # [VISUALIZATION 5 REMOVED AS REQUESTED]
+        # User Feedback: "Common sense, no chart needed."
         
-        # Left Axis: People (Blue)
-        color = 'tab:blue'
-        ax1.set_xlabel('Date')
-        ax1.set_ylabel('Participants (Millions)', color=color)
-        ax1.plot(monthly_df['parsed_date'], monthly_df[part_persons_col] / 1e6, color=color, label='People', linewidth=2)
-        ax1.tick_params(axis='y', labelcolor=color)
-        
-        # Right Axis: Cost (Green)
-        ax2 = ax1.twinx()
-        color = 'tab:green'
-        ax2.set_ylabel('Total Benefit Cost (Billions $)', color=color)  
-        ax2.plot(monthly_df['parsed_date'], monthly_df[cost_col] / 1e9, color=color, linestyle='--', label='Cost', linewidth=2)
-        ax2.tick_params(axis='y', labelcolor=color)
-        
-        plt.title("The Cost of Hunger: Demand vs. Spending")
-        plt.tight_layout()
-        plt.savefig("cost_of_hunger.png")
-        
-        # --- EXPLANATION 5 ---
-        print("\n" + "-"*60)
-        print("VISUAL GENERATED: 'cost_of_hunger.png'")
-        print("-"*60)
-        print("WHAT IT IS: The 'ROI' of benefits.")
-        print("HOW TO READ: If Green (Cost) goes up faster than Blue (People), inflation is high.")
-        print("ACTION: Use this chart in Donor Letters to explain why you need more money")
-        print("        just to feed the SAME number of people.")
+        return monthly_df
         
         return monthly_df
 
